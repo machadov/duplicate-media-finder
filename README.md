@@ -32,6 +32,7 @@ A command-line tool to find and group duplicate images and videos based on conte
 - **Recursive Folder Scanning**: Searches through all subfolders in the specified directories.
 - **Adjustable Similarity Threshold**: Allows you to specify how similar files must be to be considered duplicates.
 - **Disable Media Types**: Optionally disable image or video comparison.
+- **Parallel Processing**: Utilizes multiple CPU cores for improved performance on large datasets.
 - **Performance Optimizations**: Optimized for large datasets with efficient algorithms and reduced memory usage.
 - **Detailed Output**: Generates a JSON file grouping similar files along with their similarity percentages.
 - **Progress Indicators**: Provides real-time feedback on the scanning and comparison processes.
@@ -48,7 +49,7 @@ A command-line tool to find and group duplicate images and videos based on conte
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/duplicate-media-finder.git
+   git clone https://github.com/machadov/duplicate-media-finder.git
    cd duplicate-media-finder
    ```
 
@@ -70,7 +71,7 @@ A command-line tool to find and group duplicate images and videos based on conte
    If `requirements.txt` is not provided, you can install the packages manually:
 
    ```bash
-   pip install Pillow imagehash opencv-python tqdm scipy
+   pip install Pillow imagehash opencv-python tqdm numpy scipy
    ```
 
 ## Usage
@@ -109,6 +110,12 @@ python duplicate_finder.py /path/to/folder1 /path/to/folder2
   python duplicate_finder.py /path/to/folder --no-videos
   ```
 
+- **`--processes`**: Specify the number of processes (CPU cores) to use. Default is the number of available CPU cores.
+
+  ```bash
+  python duplicate_finder.py /path/to/folder --processes 4
+  ```
+
 ### Examples
 
 #### Example 1: Basic Scan
@@ -143,7 +150,15 @@ Scan folders but only compare images.
 python duplicate_finder.py /path/to/folder --no-videos
 ```
 
-#### Example 5: Specify Output File
+#### Example 5: Specify Number of Processes
+
+Use 4 CPU cores for processing.
+
+```bash
+python duplicate_finder.py /path/to/folder --processes 4
+```
+
+#### Example 6: Specify Output File
 
 Save the results to a specific file.
 
@@ -156,12 +171,13 @@ python duplicate_finder.py /path/to/folder -o results.json
 1. **Folder Scanning**: The tool recursively scans the provided folders for media files. Supported image formats include PNG, JPEG, BMP, GIF, and TIFF. Supported video formats include MP4, AVI, MOV, MKV, and FLV.
 
 2. **Hash Generation**:
-   - **Images**: Generates perceptual hashes for each image using the `imagehash` library, which is built on top of the `Pillow` library.
-   - **Videos**: Extracts the middle frame of each video and generates a perceptual hash for that frame.
+   - **Images**: Generates perceptual hashes for each image using the `imagehash` library, which is built on top of the `Pillow` library. Hash generation is parallelized across multiple CPU cores.
+   - **Videos**: Extracts the middle frame of each video and generates a perceptual hash for that frame. Video processing is also parallelized.
 
 3. **Content Comparison**: Compares the hashes of the media files to calculate a similarity score. The similarity is calculated based on the Hamming distance between the hashes.
 
 4. **Performance Optimizations**:
+   - **Parallel Processing**: Utilizes multiple CPU cores for hash generation and comparisons, significantly reducing processing time on large datasets.
    - **Hash Bucketing**: Files are grouped into buckets based on a portion of their hash values to reduce the number of comparisons.
    - **Efficient Data Structures**: Utilizes dictionaries and NumPy arrays for efficient data storage and computation.
    - **Reduced Memory Usage**: Processes data in a way that minimizes memory consumption, suitable for large datasets.
@@ -172,6 +188,7 @@ python duplicate_finder.py /path/to/folder -o results.json
 
 ## Performance Optimizations
 
+- **Parallel Processing**: The script uses Python's `multiprocessing` module to parallelize hash generation and comparisons, making full use of multi-core CPUs.
 - **Reduced Computation Time**: By grouping files into hash buckets and only comparing files within the same bucket, the number of pairwise comparisons is significantly reduced.
 - **Memory Efficiency**: Efficient data structures like NumPy arrays and dictionaries are used to minimize memory usage.
 - **Scalability**: Optimized to handle large datasets effectively.
@@ -225,6 +242,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - **[tqdm](https://github.com/tqdm/tqdm)**: Provides progress bars for long-running operations.
 - **[NumPy](https://numpy.org/)**: Fundamental package for scientific computing with Python.
 - **[SciPy](https://www.scipy.org/)**: Used for efficient distance calculations.
+- **[Multiprocessing](https://docs.python.org/3/library/multiprocessing.html)**: Python module used for parallel processing.
 
 ---
 
